@@ -16,11 +16,8 @@ COPY . .
 # Make port 8080 available to the world outside this container
 EXPOSE 8080
 
-# Copy the start script and make it executable
-RUN chmod +x start.sh
-
-# Use a non-root user for better security
-USER node
+# Create admin
+RUN npm run create-admin
 
 # Command to run the application
-CMD ["./start.sh"]
+CMD ["npm", "start"]
