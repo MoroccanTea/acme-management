@@ -1,37 +1,55 @@
-const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
-const dbConfig = require('../config/database');
+const pool = require('../config/database');
 
-class User {
-  static async findById(id) {
-    const connection = await mysql.createConnection(dbConfig);
-    const [rows] = await connection.execute('SELECT * FROM users WHERE id = ?', [id]);
-    await connection.end();
+const User = {
+  findAll: async () => {
+    const connection = await pool;
+    const [rows] = await connection.query('SELECT * FROM users');
+    return rows;
+  },
+
+  findById: async (id) => {
+    const connection = await pool;
+    const [rows] = await connection.query('SELECT * FROM users WHERE id = ?', [id]);
     return rows[0];
-  }
+  },
 
-  static async findByEmail(email) {
-    const connection = await mysql.createConnection(dbConfig);
-    const [rows] = await connection.execute('SELECT * FROM users WHERE email = ?', [email]);
-    await connection.end();
+  findByEmail: async (email) => {
+    const connection = await pool;
+    const [rows] = await connection.query('SELECT * FROM users WHERE email = ?', [email]);
     return rows[0];
-  }
+  },
 
-  static async create(userData) {
+  create: async (userData) => {
+    const connection = await pool;
     const { name, email, password, isAdmin } = userData;
     const hashedPassword = await bcrypt.hash(password, 10);
-    const connection = await mysql.createConnection(dbConfig);
-    const [result] = await connection.execute(
+    const [result] = await connection.query(
       'INSERT INTO users (name, email, password, isAdmin) VALUES (?, ?, ?, ?)',
       [name, email, hashedPassword, isAdmin ? 1 : 0]
     );
-    await connection.end();
-    return result.insertId;
-  }
+    return { id: result.insertId, ...userData, password: undefined };
+  },
 
-  static async comparePassword(password, hash) {
+  update: async (id, userData) => {
+    const connection = await pool;
+    const { name, email, isAdmin } = userData;
+    const [result] = await connection.query(
+      'UPDATE users SET name = ?, email = ?, isAdmin = ? WHERE id = ?',
+      [name, email, isAdmin ? 1 : 0, id]
+    );
+    return result.affectedRows > 0;
+  },
+
+  delete: async (id) => {
+    const connection = await pool;
+    const [result] = await connection.query('DELETE FROM users WHERE id = ?', [id]);
+    return result.affectedRows > 0;
+  },
+
+  comparePassword: async (password, hash) => {
     return bcrypt.compare(password, hash);
   }
-}
+};
 
 module.exports = User;

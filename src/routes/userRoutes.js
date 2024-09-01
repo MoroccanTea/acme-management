@@ -5,6 +5,42 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const { isAuth, isAdmin } = require('../middlewares/auth');
 
+router.get('/', async (req, res) => {
+  try {
+    const users = await User.findAll();
+    users.forEach(user => delete user.password);
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching users', error: error.message });
+  }
+});
+
+router.get('/:email', async (req, res) => {
+  try {
+    const user = await User.findByEmail(req.params.email);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    delete user.password;
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching user', error: error.message });
+  }
+});
+
+router.put('/:id', async (req, res) => {
+  try {
+    const { name, email, isAdmin } = req.body;
+    const updated = await User.update(req.params.id, { name, email, isAdmin });
+    if (!updated) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json({ message: 'User updated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating user', error: error.message });
+  }
+});
+
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password, isAdmin } = req.body;

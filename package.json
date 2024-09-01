@@ -6,8 +6,7 @@
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
-    "test": "jest",
-    "create-admin": "node src/scripts/startup.js"
+    "test": "jest"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
