@@ -74,11 +74,22 @@ router.post('/login', async (req, res) => {
 });
 
 router.get('/profile', isAuth, (req, res) => {
-  res.json({ user: req.user });
+  try {
+    res.json(req.user);
+  }
+  catch (error) {
+    res.status(500).json({ message: 'Error fetching user profile', error: error.message });
+  }
 });
 
 router.get('/admin', isAuth, isAdmin, (req, res) => {
-  res.json({ message: 'Admin access granted' });
+  try {
+    res.json({ message: 'Admin access granted' });
+  }
+  catch (error) {
+    res.status(500).json({ message: 'Error fetching admin profile', error: error.message });
+  }
+
 });
 
 module.exports = router;

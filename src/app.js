@@ -7,6 +7,7 @@ const projectRoutes = require('./routes/projectRoutes');
 const expenseRoutes = require('./routes/expenseRoutes');
 const userRoutes = require('./routes/userRoutes');
 const { isAuth } = require('./middlewares/auth');
+const createAdminUser  = require('./scripts/create-admin');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -27,5 +28,10 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`API is running on port ${PORT}`);
 });
+
+// Create the admin user after 1 minute
+setTimeout(() => {
+  createAdminUser();
+}, 60000);

@@ -5,9 +5,9 @@ const connectWithRetry = async () => {
   let retries = 0;
   let success = false;
 
-  while (retries < maxRetries || success !== true) {
+  while (!success) {
+    while (retries < maxRetries)
     try {
-
       const pool = mysql.createPool({
         host: process.env.DB_HOST,
         user: process.env.DB_USER,
@@ -27,6 +27,7 @@ const connectWithRetry = async () => {
       console.error('Failed to connect to the database. Error details:');
       console.error(err);
       retries++;
+      success = false;
       console.log(`Retrying in 5 seconds... (Attempt ${retries} of ${maxRetries})`);
       await new Promise(resolve => setTimeout(resolve, 5000)); // Wait for 5 seconds before retrying
     }
