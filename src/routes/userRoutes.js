@@ -21,7 +21,6 @@ router.get('/:email', async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    delete user.password;
     res.json(user);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching user', error: error.message });

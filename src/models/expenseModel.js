@@ -9,7 +9,7 @@ const Expense = {
 
   getById: async (id) => {
     const connection = await pool;
-    const [rows] = await connection.query('SELECT * FROM expenses WHERE id = ?', [id]);
+    const [rows] = await connection.query('SELECT * FROM expenses WHERE id = '+ id);
     return rows[0];
   },
 
